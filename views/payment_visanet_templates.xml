@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <template id="visanet_form">
+            <input type="hidden" name="data_set" t-att-data-action-url="tx_url" data-remove-me=""/>
+            <input type="hidden" name="access_key" t-att-value="visanet_access_key" />
+            <input type="hidden" name="profile_id" t-att-value="visanet_profile_id"/>
+            <input type="hidden" name="amount" t-att-value="visanet_amount"/>
+            <input type="hidden" name="currency" t-att-value="visanet_currency"/>
+            <input type="hidden" name="transaction_type" t-att-value="visanet_transaction_type"/>
+            <input type="hidden" name="reference_number" t-att-value="visanet_reference"/>
+            <input type="hidden" name="transaction_uuid" t-att-value="visanet_id"/>
+            <input type="hidden" name="signed_date_time" t-att-value="visanet_date"/>
+            <input type="hidden" name="language" t-att-value="visanet_language"/>
+            <input type="hidden" name="signed_field_names" t-att-value="visanet_signed_field_names"/>
+            <input type="hidden" name="signature" t-att-value="visanet_signature"/>
+            
+            <input type="hidden" name="unsigned_field_names" t-att-value="visanet_unsigned_field_names"/>
+            <input type="hidden" name="bill_to_forename" t-att-value="partner_first_name"/>
+            <input type="hidden" name="bill_to_surname" t-att-value="partner_last_name"/>
+            <input type="hidden" name="bill_to_email" t-att-value="partner_email"/>
+            <input type="hidden" name="bill_to_address_line1" t-att-value="partner_address"/>
+            <input type="hidden" name="bill_to_address_postal_code" t-att-value="partner_zip"/>
+            <input type="hidden" name="bill_to_address_city" t-att-value="partner_city"/>
+            <input type="hidden" name="bill_to_address_state" t-att-value="partner_state.code"/>
+            <input type="hidden" name="bill_to_address_country" t-att-value="partner_country.code"/>
+            <input type="hidden" name="bill_to_phone" t-att-value="partner_phone"/>
+        </template>
+
+    </data>
+</odoo>
