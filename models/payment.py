@@ -5,6 +5,7 @@ import random
 import hmac
 import hashlib
 import base64
+import uuid
 
 from odoo import api, fields, models, _
 from odoo.addons.payment.models.payment_acquirer import ValidationError
@@ -23,25 +24,29 @@ class AcquirerVisaNet(models.Model):
 
     def visanet_form_generate_values(self, values):
         reference = values['reference']
-        transaction_date = fields.datetime.now().isoformat()
-        # signed_field_names = ['access_key', 'profile_id', 'transaction_uuid', 'signed_field_names', 'unsigned_field_names', 'signed_date_time', 'locale', 'transaction_type', 'reference_number', 'transaction_uuid', 'signed_field_names', 'unsigned_field_names', 'signed_date_time', 'locale', 'transaction_type', 'reference_number', 'amount', 'currency']
-        signed_field_names = [ ]
-        unsigned_field_names = 'bill_to_forename,bill_to_surname,bill_to_email,bill_to_address_line1,bill_to_address_postal_code,bill_to_address_city,bill_to_address_state,bill_to_address_country,bill_to_phone,return_url'
+        # reference = '1588094529374'
+        transaction_date = fields.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+        # transaction_date = '2020-04-28T17:57:28Z'
+        transaction_uuid = uuid.uuid4().hex
+        signed_field_names = ['access_key', 'profile_id', 'transaction_uuid', 'signed_field_names', 'unsigned_field_names', 'signed_date_time', 'locale', 'transaction_type', 'reference_number', 'amount', 'currency']
+        # unsigned_field_names = 'bill_to_forename,bill_to_surname,bill_to_email,bill_to_address_line1,bill_to_address_postal_code,bill_to_address_city,bill_to_address_state,bill_to_address_country,bill_to_phone,return_url'
+        unsigned_field_names = ''
         language = 'es-es'
         transaction_type = 'sale'
         currency = 'GTQ'
 
-        # signed_field_values = [self.visanet_access_key, self.visanet_profile_id, reference, ','.join(signed_field_names), unsigned_field_names, transaction_date, language, transaction_type, reference, values['amount'], currency]
-        signed_field_values = []
+        signed_field_values = [self.visanet_access_key, self.visanet_profile_id, transaction_uuid, ','.join(signed_field_names), unsigned_field_names, transaction_date, language, transaction_type, reference, values['amount'], currency]
+        # signed_field_values = [self.visanet_access_key, self.visanet_profile_id, '5ea8669080690', ','.join(signed_field_names), unsigned_field_names, transaction_date, language, transaction_type, reference, values['amount'], currency]
 
         signed_string = []
         for i in range(len(signed_field_names)):
             signed_string.append(signed_field_names[i]+"="+str(signed_field_values[i]))
+
+        key = bytes(self.visanet_secret_key, 'utf-8')
+        message = bytes(','.join(signed_string), 'utf-8')
         logging.warn(','.join(signed_string))
         logging.warn(str.encode(self.visanet_secret_key))
 
-        dig = hmac.new(str.encode(self.visanet_secret_key), msg=(','.join(signed_string)).encode('utf-8'), digestmod=hashlib.sha256).digest()
-        logging.warn(dig.hex())
         base_url = self.env['ir.config_parameter'].get_param('web.base.url')
         visanet_tx_values = dict(values)
         visanet_tx_values.update({
@@ -50,7 +55,7 @@ class AcquirerVisaNet(models.Model):
             'visanet_profile_id': self.visanet_profile_id,
             'visanet_amount': values['amount'],
             'visanet_reference': reference,
-            'visanet_id': reference,
+            'visanet_uuid': transaction_uuid,
             'visanet_date': transaction_date,
             'visanet_language': language,
             'visanet_transaction_type': transaction_type,
@@ -58,7 +63,7 @@ class AcquirerVisaNet(models.Model):
             'visanet_signed_field_names': ','.join(signed_field_names),
             'visanet_unsigned_field_names': unsigned_field_names,
             'visanet_return': '%s' % urllib.parse.urljoin(base_url, VisaNetController._return_url),
-            'visanet_signature': base64.b64encode(dig),
+            'visanet_signature': base64.b64encode(hmac.new(key, message, digestmod=hashlib.sha256).digest()),
         })
         logging.warn(visanet_tx_values)
         return visanet_tx_values
