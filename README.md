@@ -1,5 +1,8 @@
 # payment_visanet
 
 Es necesario activar lo siguiente:
-* CVN en los tipos de tarjetas en Payment Settings: https://ebc2test.cybersource.com/ebc2/app/PaymentConfiguration/SecureAcceptanceSettings
-* Billing information en Payment Form > Checkout Steps: https://ebc2test.cybersource.com/ebc2/app/PaymentConfiguration/SecureAcceptanceSettings
+https://ebc2test.cybersource.com/ebc2/app/PaymentConfiguration/SecureAcceptanceSettings
+* CVN en los tipos de tarjetas en Payment Settings
+* Billing information en Payment Form > Checkout Steps
+* Transaction Response Page en Customer Response
+* Custom Cancel Response Page en Customer Response
