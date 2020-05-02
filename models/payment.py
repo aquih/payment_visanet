@@ -14,6 +14,8 @@ from odoo.tools.float_utils import float_compare
 
 _logger = logging.getLogger(__name__)
 
+signed_field_names = ['access_key', 'profile_id', 'transaction_uuid', 'signed_field_names', 'unsigned_field_names', 'signed_date_time', 'locale', 'transaction_type', 'reference_number', 'amount', 'currency']
+
 class AcquirerVisaNet(models.Model):
     _inherit = 'payment.acquirer'
 
@@ -28,9 +30,8 @@ class AcquirerVisaNet(models.Model):
         transaction_date = fields.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         # transaction_date = '2020-04-28T17:57:28Z'
         transaction_uuid = uuid.uuid4().hex
-        signed_field_names = ['access_key', 'profile_id', 'transaction_uuid', 'signed_field_names', 'unsigned_field_names', 'signed_date_time', 'locale', 'transaction_type', 'reference_number', 'amount', 'currency']
         # unsigned_field_names = 'bill_to_forename,bill_to_surname,bill_to_email,bill_to_address_line1,bill_to_address_postal_code,bill_to_address_city,bill_to_address_state,bill_to_address_country,bill_to_phone,return_url'
-        unsigned_field_names = ''
+        unsigned_field_names = 'bill_to_forename,bill_to_surname,bill_to_email,bill_to_address_line1,bill_to_address_postal_code,bill_to_address_city,bill_to_address_state,bill_to_address_country,bill_to_phone'
         language = 'es-es'
         transaction_type = 'sale'
         currency = 'GTQ'
@@ -44,8 +45,6 @@ class AcquirerVisaNet(models.Model):
 
         key = bytes(self.visanet_secret_key, 'utf-8')
         message = bytes(','.join(signed_string), 'utf-8')
-        logging.warn(','.join(signed_string))
-        logging.warn(str.encode(self.visanet_secret_key))
 
         base_url = self.env['ir.config_parameter'].get_param('web.base.url')
         visanet_tx_values = dict(values)
@@ -65,11 +64,13 @@ class AcquirerVisaNet(models.Model):
             'visanet_return': '%s' % urllib.parse.urljoin(base_url, VisaNetController._return_url),
             'visanet_signature': base64.b64encode(hmac.new(key, message, digestmod=hashlib.sha256).digest()),
         })
-        logging.warn(visanet_tx_values)
         return visanet_tx_values
 
     def visanet_get_form_action_url(self):
-        return "https://testsecureacceptance.cybersource.com/pay"
+        if self.state == 'enabled':
+            return "https://secureacceptance.cybersource.com/pay"
+        else:
+            return "https://testsecureacceptance.cybersource.com/pay"
 
 class TxVisaNet(models.Model):
     _inherit = 'payment.transaction'
@@ -85,10 +86,9 @@ class TxVisaNet(models.Model):
             _logger.info(error_msg)
             raise ValidationError(error_msg)
 
-        order = reference
-        tx = self.search([('reference', '=', order)])
+        tx = self.search([('reference', '=', reference)])
         if not tx or len(tx) > 1:
-            error_msg = _('VisaNet: received data for reference %s') % (order)
+            error_msg = _('VisaNet: received data for reference %s') % (reference)
             if not tx:
                 error_msg += _('; no order found')
             else:
@@ -100,27 +100,37 @@ class TxVisaNet(models.Model):
 
     def _visanet_form_get_invalid_parameters(self, data):
         invalid_parameters = []
-        # check what is buyed
-        if float_compare(float(data.get('amount', '0.0')), self.amount, 2) != 0:
-            invalid_parameters.append(('Amount', data.get('amount'), '%.2f' % self.amount))
+        status_code = data.get('decision', 'ERROR')
+                    
+        if status_code == 'ACCEPT':
+            if float_compare(float(data.get('auth_amount', '0.0')), self.amount, 2) != 0:
+                invalid_parameters.append(('auth_amount', data.get('auth_amount'), '%.2f' % self.amount))
 
+            signed_string = []
+            for field in data.get('signed_field_names', '').split(','):
+                signed_string.append(field+"="+data.get(field, ''))
+
+            key = bytes(self.acquirer_id.visanet_secret_key, 'utf-8')
+            message = bytes(','.join(signed_string), 'utf-8')
+            sign = base64.b64encode(hmac.new(key, message, digestmod=hashlib.sha256).digest()).decode('utf-8')
+            if data.get('signature', '') != sign:
+                invalid_parameters.append(('signature', data.get('signature'), '%s' % sign))
+                
         return invalid_parameters
 
     def _visanet_form_validate(self, data):
         status_code = data.get('decision', 'ERROR')
+        vals = {
+            "date": fields.datetime.now(),
+            "acquirer_reference": data.get('transaction_id'),
+        }
         if status_code == 'ACCEPT':
-            self.write({
-                'state': 'done',
-                'acquirer_reference': data.get('transaction_id'),
-                'date_validate': fields.datetime.now(),
-            })
+            self.write(vals)
+            self._set_transaction_done()
             return True
         else:
-            error = 'VisaNet: feedback error'
+            error = 'VisaNet: error '+data.get('message')
             _logger.info(error)
-            self.write({
-                'state': 'error',
-                'state_message': error,
-                'acquirer_reference': data.get('transactionid'),
-            })
+            self.write(vals)
+            self._set_transaction_error(error)
             return False
