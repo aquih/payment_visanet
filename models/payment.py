@@ -105,6 +105,9 @@ class TxVisaNet(models.Model):
         if status_code == 'ACCEPT':
             if float_compare(float(data.get('auth_amount', '0.0')), self.amount, 2) != 0:
                 invalid_parameters.append(('auth_amount', data.get('auth_amount'), '%.2f' % self.amount))
+                
+            if data.get('req_currency') != 'GTQ':
+                invalid_parameters.append(('req_currency', data.get('req_currency'), 'GTQ'))
 
             signed_string = []
             for field in data.get('signed_field_names', '').split(','):
