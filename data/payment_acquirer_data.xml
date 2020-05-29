@@ -18,6 +18,9 @@
                 </ul>
             </field>
             <field name="payment_icon_ids" eval='[(6, 0, [ref("payment.payment_icon_cc_mastercard"), ref("payment.payment_icon_cc_visa")])]'/>
+            <field name="visanet_access_key">dummy</field>
+            <field name="visanet_secret_key">dummy</field>
+            <field name="visanet_profile_id">dummy</field>
         </record>    
 
     </data>
