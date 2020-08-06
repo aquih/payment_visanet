@@ -67,7 +67,7 @@ class AcquirerVisaNet(models.Model):
         return visanet_tx_values
 
     def visanet_get_form_action_url(self):
-        if self.state == 'enabled':
+        if ( 'environment' in self.fields_get() and self.environment == 'prod' ) or ( 'state' in self.fields_get() and self.state == 'enabled' ):
             return "https://secureacceptance.cybersource.com/pay"
         else:
             return "https://testsecureacceptance.cybersource.com/pay"
