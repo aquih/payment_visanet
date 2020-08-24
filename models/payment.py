@@ -11,6 +11,7 @@ from odoo import api, fields, models, _
 from odoo.addons.payment.models.payment_acquirer import ValidationError
 from odoo.addons.payment_visanet.controllers.payment import VisaNetController
 from odoo.tools.float_utils import float_compare
+from odoo.release import version_info
 
 _logger = logging.getLogger(__name__)
 
@@ -124,16 +125,26 @@ class TxVisaNet(models.Model):
     def _visanet_form_validate(self, data):
         status_code = data.get('decision', 'ERROR')
         vals = {
-            "date": fields.datetime.now(),
             "acquirer_reference": data.get('transaction_id'),
         }
         if status_code == 'ACCEPT':
-            self.write(vals)
-            self._set_transaction_done()
+            if version_info[0] > 11:
+                self.write(vals)
+                self._set_transaction_done()
+            else:
+                vals['state'] = 'done'
+                vals['date'] = fields.Datetime.now()
+                self.write(vals)
             return True
         else:
             error = 'VisaNet: error '+data.get('message')
             _logger.info(error)
-            self.write(vals)
-            self._set_transaction_error(error)
+            if version_info[0] > 11:
+                self.write(vals)
+                self._set_transaction_error(error)
+            else:
+                vals['state'] = 'error'
+                vals['state_message'] = error
+                vals['date'] = fields.Datetime.now()
+                self.write(vals)
             return False
