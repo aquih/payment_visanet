@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="1">
+    <data>
 
         <record id="payment_acquirer_visanet" model="payment.acquirer">
             <field name="name">VisaNet</field>
@@ -8,6 +8,7 @@
             <field name="provider">visanet</field>
             <field name="company_id" ref="base.main_company"/>
             <field name="image_128" type="base64" file="payment_visanet/static/src/img/visanet_icon.png"/>
+            <field name="image" type="base64" file="payment_visanet/static/src/img/visanet_icon.png"/>
             <field name="pre_msg"><![CDATA[<p>Será redireccionado al sitio de VisaNet para que ingrese sus datos luego de apachar el botón de "Pagar ahora".</p>]]></field>
             <field name="description" type="html">
                 <p>

@@ -27,18 +27,16 @@ class AcquirerVisaNet(models.Model):
 
     def visanet_form_generate_values(self, values):
         reference = values['reference']
-        # reference = '1588094529374'
         transaction_date = fields.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
-        # transaction_date = '2020-04-28T17:57:28Z'
         transaction_uuid = uuid.uuid4().hex
-        # unsigned_field_names = 'bill_to_forename,bill_to_surname,bill_to_email,bill_to_address_line1,bill_to_address_postal_code,bill_to_address_city,bill_to_address_state,bill_to_address_country,bill_to_phone,return_url'
-        unsigned_field_names = 'bill_to_forename,bill_to_surname,bill_to_email,bill_to_address_line1,bill_to_address_postal_code,bill_to_address_city,bill_to_address_state,bill_to_address_country,bill_to_phone'
+        unsigned_field_names = 'bill_to_forename,bill_to_surname,bill_to_email,bill_to_address_line1,bill_to_address_line2,bill_to_address_postal_code,bill_to_address_city,bill_to_address_state,bill_to_address_country,bill_to_phone'
         language = 'es-es'
         transaction_type = 'sale'
-        currency = 'GTQ'
+        currency = values['currency'].name
+        visanet_partner_address1 = values['partner'].street[0:35]
+        visanet_partner_address2 = values['partner'].street2[0:35]
 
         signed_field_values = [self.visanet_access_key, self.visanet_profile_id, transaction_uuid, ','.join(signed_field_names), unsigned_field_names, transaction_date, language, transaction_type, reference, values['amount'], currency]
-        # signed_field_values = [self.visanet_access_key, self.visanet_profile_id, '5ea8669080690', ','.join(signed_field_names), unsigned_field_names, transaction_date, language, transaction_type, reference, values['amount'], currency]
 
         signed_string = []
         for i in range(len(signed_field_names)):
@@ -60,6 +58,8 @@ class AcquirerVisaNet(models.Model):
             'visanet_language': language,
             'visanet_transaction_type': transaction_type,
             'visanet_currency': currency,
+            'visanet_partner_address1': visanet_partner_address1,
+            'visanet_partner_address2': visanet_partner_address2,
             'visanet_signed_field_names': ','.join(signed_field_names),
             'visanet_unsigned_field_names': unsigned_field_names,
             'visanet_return': '%s' % urllib.parse.urljoin(base_url, VisaNetController._return_url),
@@ -80,7 +80,6 @@ class TxVisaNet(models.Model):
     def _visanet_form_get_tx_from_data(self, data):
         """ Given a data dict coming from visanet, verify it and find the related
         transaction record. """
-        origin_data = dict(data)
         reference = data.get('req_reference_number')
         if not reference:
             error_msg = _('VisaNet: received data with missing reference (%s)') % (reference)
@@ -88,6 +87,7 @@ class TxVisaNet(models.Model):
             raise ValidationError(error_msg)
 
         tx = self.search([('reference', '=', reference)])
+        data['return_url'] = '/quote/%d/%s' % (tx.sale_order_id.id, tx.sale_order_id.access_token)
         if not tx or len(tx) > 1:
             error_msg = _('VisaNet: received data for reference %s') % (reference)
             if not tx:
