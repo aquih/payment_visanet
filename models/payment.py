@@ -33,8 +33,8 @@ class AcquirerVisaNet(models.Model):
         language = 'es-es'
         transaction_type = 'sale'
         currency = values['currency'].name
-        visanet_partner_address1 = values['partner'].street[0:35]
-        visanet_partner_address2 = values['partner'].street2[0:35]
+        visanet_partner_address1 = values['partner'].street[0:35] if values['partner'].street else ''
+        visanet_partner_address2 = values['partner'].street2[0:35] if values['partner'].street2 else ''
 
         signed_field_values = [self.visanet_access_key, self.visanet_profile_id, transaction_uuid, ','.join(signed_field_names), unsigned_field_names, transaction_date, language, transaction_type, reference, values['amount'], currency]
 
