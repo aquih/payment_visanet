@@ -87,7 +87,10 @@ class TxVisaNet(models.Model):
             raise ValidationError(error_msg)
 
         tx = self.search([('reference', '=', reference)])
-        data['return_url'] = '/quote/%d/%s' % (tx.sale_order_id.id, tx.sale_order_id.access_token)
+
+        if version_info[0] == 11:
+            data['return_url'] = '/quote/%d/%s' % (tx.sale_order_id.id, tx.sale_order_id.access_token)
+
         if not tx or len(tx) > 1:
             error_msg = _('VisaNet: received data for reference %s') % (reference)
             if not tx:
@@ -107,7 +110,7 @@ class TxVisaNet(models.Model):
             if float_compare(float(data.get('auth_amount', '0.0')), self.amount, 2) != 0:
                 invalid_parameters.append(('auth_amount', data.get('auth_amount'), '%.2f' % self.amount))
                 
-            if data.get('req_currency') != 'GTQ':
+            if data.get('req_currency') != self.currency_id.name:
                 invalid_parameters.append(('req_currency', data.get('req_currency'), 'GTQ'))
 
             signed_string = []
