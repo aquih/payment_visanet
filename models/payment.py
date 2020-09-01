@@ -89,7 +89,10 @@ class TxVisaNet(models.Model):
         tx = self.search([('reference', '=', reference)])
 
         if version_info[0] == 11:
-            data['return_url'] = '/quote/%d/%s' % (tx.sale_order_id.id, tx.sale_order_id.access_token)
+            if tx.sale_order_id:
+                data['return_url'] = '/quote/%d/%s' % (tx.sale_order_id.id, tx.sale_order_id.access_token)
+            else:
+                data['return_url'] = '/my/invoices/%d/%s' % (tx.account_invoice_id.id, tx.account_invoice_id.access_token)
 
         if not tx or len(tx) > 1:
             error_msg = _('VisaNet: received data for reference %s') % (reference)
