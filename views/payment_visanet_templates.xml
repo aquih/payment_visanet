@@ -26,7 +26,7 @@
             <input type="hidden" name="bill_to_address_city" t-att-value="partner_city"/>
             <input type="hidden" name="bill_to_address_state" t-att-value="partner_state.code"/>
             <input type="hidden" name="bill_to_address_country" t-att-value="partner_country.code"/>
-            <input type="hidden" name="bill_to_phone" t-att-value="partner_phone"/>
+            <input type="hidden" name="bill_to_phone" t-att-value="partner_phone.zfill(6)"/>
         </template>
 
     </data>
