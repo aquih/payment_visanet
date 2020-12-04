@@ -21,4 +21,4 @@ class VisaNetController(http.Controller):
         _logger.info('VisaNet: entering form_feedback with post data %s', pprint.pformat(post))  # debug
         request.env['payment.transaction'].sudo().form_feedback(post, 'visanet')
         _logger.warn(post)
-        return werkzeug.utils.redirect(post.pop('return_url', '/payment/process'))
+        return werkzeug.utils.redirect('/payment/process')
