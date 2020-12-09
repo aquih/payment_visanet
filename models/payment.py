@@ -48,6 +48,7 @@ class AcquirerVisaNet(models.Model):
         base_url = self.env['ir.config_parameter'].get_param('web.base.url')
         visanet_tx_values = dict(values)
         visanet_tx_values.update({
+            'return_url': urllib.parse.urljoin(base_url, VisaNetController._return_url),
             'visanet_access_key': self.visanet_access_key,
             'visanet_secret_key': self.visanet_secret_key,
             'visanet_profile_id': self.visanet_profile_id,
@@ -68,6 +69,7 @@ class AcquirerVisaNet(models.Model):
         return visanet_tx_values
 
     def visanet_get_form_action_url(self):
+        self.ensure_one()
         if ( 'environment' in self.fields_get() and self.environment == 'prod' ) or ( 'state' in self.fields_get() and self.state == 'enabled' ):
             return "https://secureacceptance.cybersource.com/pay"
         else:
