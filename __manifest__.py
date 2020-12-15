@@ -6,7 +6,7 @@
     'summary': 'Payment Acquirer: VisaNet Implementation',
     'version': '1.0',
     'description': """VisaNet Payment Acquirer""",
-    'author': 'José Rodrigo Fernández Menegazzo',
+    'author': 'aquíH',
     'website': 'http://aquih.com/',
     'depends': ['payment'],
     'data': [

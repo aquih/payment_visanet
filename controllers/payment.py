@@ -6,7 +6,6 @@ import werkzeug
 
 from odoo import http
 from odoo.http import request
-from odoo.release import version_info
 
 _logger = logging.getLogger(__name__)
 
@@ -17,7 +16,7 @@ class VisaNetController(http.Controller):
     def visanet_return(self, **post):
         """ VisaNet """
         _logger.info('VisaNet: entering form_feedback with post data %s', pprint.pformat(post))  # debug
+        _logger.info(request.session.get("__payment_tx_ids__", []))
         request.env['payment.transaction'].sudo().form_feedback(post, 'visanet')
         _logger.warn(post)
         return werkzeug.utils.redirect(post.pop('return_url', '/payment/process'))
-

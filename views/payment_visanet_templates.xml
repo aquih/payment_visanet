@@ -28,7 +28,11 @@
                 <input type="hidden" name="bill_to_address_state" t-att-value="partner_state.code"/>
                 <input type="hidden" name="bill_to_address_country" t-att-value="partner_country.code"/>
                 <input type="hidden" name="bill_to_phone" t-att-value="partner_phone.zfill(6)"/>
-            <div>
+                
+                <t t-if="return_url">
+                    <input type='hidden' name='return_url' t-att-value='return_url'/>
+                </t>
+            </div>
         </template>
 
     </data>
