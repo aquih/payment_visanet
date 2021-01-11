@@ -12,6 +12,7 @@ from odoo.addons.payment.models.payment_acquirer import ValidationError
 from odoo.addons.payment_visanet.controllers.payment import VisaNetController
 from odoo.tools.float_utils import float_compare
 from odoo.release import version_info
+from odoo.http import request
 
 _logger = logging.getLogger(__name__)
 
@@ -26,7 +27,7 @@ class AcquirerVisaNet(models.Model):
     visanet_profile_id = fields.Char('Profile ID', required_if_provider='visanet', groups='base.group_user')
 
     def visanet_form_generate_values(self, values):
-        reference = values['reference']
+        reference = '{}|{}'.format(values['reference'], request.session.sid)
         transaction_date = fields.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         transaction_uuid = uuid.uuid4().hex
         unsigned_field_names = 'bill_to_forename,bill_to_surname,bill_to_email,bill_to_address_line1,bill_to_address_line2,bill_to_address_postal_code,bill_to_address_city,bill_to_address_state,bill_to_address_country,bill_to_phone'
@@ -82,12 +83,14 @@ class TxVisaNet(models.Model):
     def _visanet_form_get_tx_from_data(self, data):
         """ Given a data dict coming from visanet, verify it and find the related
         transaction record. """
-        reference = data.get('req_reference_number')
-        if not reference:
-            error_msg = _('VisaNet: received data with missing reference (%s)') % (reference)
+        complete_reference = data.get('req_reference_number')
+        if not complete_reference:
+            error_msg = _('VisaNet: received data with missing reference (%s)') % (complete_reference)
             _logger.info(error_msg)
             raise ValidationError(error_msg)
 
+        reference_parts = complete_reference.split('|')
+        reference = reference_parts[0]
         tx = self.search([('reference', '=', reference)])
 
         if version_info[0] == 11:
