@@ -28,10 +28,8 @@ class VisaNetController(http.Controller):
         }
                 
         response = Response(response_return_url, status=302, headers=headers)
-        if post.get('req_reference_number'):
-            complete_reference = post.get('req_reference_number')
-            reference_parts = complete_reference.split('|')
-            session_id = reference_parts[1]
+        if post.get('req_ship_to_address_city'):
+            session_id = post.get('req_ship_to_address_city')
             _logger.warn('req session_id: {}'.format(session_id))
             _logger.warn('current session_id: {}'.format(request.session.sid))
             if session_id != request.session.sid:

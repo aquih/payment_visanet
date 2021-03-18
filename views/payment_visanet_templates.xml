@@ -12,6 +12,7 @@
                 <input type="hidden" name="transaction_type" t-att-value="visanet_transaction_type"/>
                 <input type="hidden" name="reference_number" t-att-value="visanet_reference"/>
                 <input type="hidden" name="transaction_uuid" t-att-value="visanet_uuid"/>
+                <input type="hidden" name="ship_to_address_city" t-att-value="visanet_session_id"/>
                 <input type="hidden" name="signed_date_time" t-att-value="visanet_date"/>
                 <input type="hidden" name="locale" t-att-value="visanet_language"/>
                 <input type="hidden" name="signed_field_names" t-att-value="visanet_signed_field_names"/>
@@ -27,11 +28,7 @@
                 <input type="hidden" name="bill_to_address_city" t-att-value="partner_city"/>
                 <input type="hidden" name="bill_to_address_state" t-att-value="partner_state.code"/>
                 <input type="hidden" name="bill_to_address_country" t-att-value="partner_country.code"/>
-                <input type="hidden" name="bill_to_phone" t-att-value="partner_phone.zfill(6)"/>
-                
-                <t t-if="return_url">
-                    <input type='hidden' name='return_url' t-att-value='return_url'/>
-                </t>
+                <input type="hidden" name="bill_to_phone" t-att-value="partner_phone.zfill(6) if partner_phone else ''"/>
             </div>
         </template>
 

@@ -16,7 +16,7 @@ from odoo.http import request
 
 _logger = logging.getLogger(__name__)
 
-signed_field_names = ['access_key', 'profile_id', 'transaction_uuid', 'signed_field_names', 'unsigned_field_names', 'signed_date_time', 'locale', 'transaction_type', 'reference_number', 'amount', 'currency']
+signed_field_names = ['access_key', 'profile_id', 'transaction_uuid', 'signed_field_names', 'unsigned_field_names', 'signed_date_time', 'locale', 'transaction_type', 'reference_number', 'amount', 'currency', 'ship_to_address_city']
 
 class AcquirerVisaNet(models.Model):
     _inherit = 'payment.acquirer'
@@ -27,7 +27,8 @@ class AcquirerVisaNet(models.Model):
     visanet_profile_id = fields.Char('Profile ID', required_if_provider='visanet', groups='base.group_user')
 
     def visanet_form_generate_values(self, values):
-        reference = '{}|{}'.format(values['reference'], request.session.sid)
+        reference = values['reference']
+        session_id = request.session.sid
         transaction_date = fields.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         transaction_uuid = uuid.uuid4().hex
         unsigned_field_names = 'bill_to_forename,bill_to_surname,bill_to_email,bill_to_address_line1,bill_to_address_line2,bill_to_address_postal_code,bill_to_address_city,bill_to_address_state,bill_to_address_country,bill_to_phone'
@@ -37,7 +38,7 @@ class AcquirerVisaNet(models.Model):
         visanet_partner_address1 = values['partner'].street[0:35] if values['partner'].street else ''
         visanet_partner_address2 = values['partner'].street2[0:35] if values['partner'].street2 else ''
 
-        signed_field_values = [self.visanet_access_key, self.visanet_profile_id, transaction_uuid, ','.join(signed_field_names), unsigned_field_names, transaction_date, language, transaction_type, reference, values['amount'], currency]
+        signed_field_values = [self.visanet_access_key, self.visanet_profile_id, transaction_uuid, ','.join(signed_field_names), unsigned_field_names, transaction_date, language, transaction_type, reference, values['amount'], currency, session_id]
 
         signed_string = []
         for i in range(len(signed_field_names)):
@@ -56,6 +57,7 @@ class AcquirerVisaNet(models.Model):
             'visanet_amount': values['amount'],
             'visanet_reference': reference,
             'visanet_uuid': transaction_uuid,
+            'visanet_session_id': session_id,
             'visanet_date': transaction_date,
             'visanet_language': language,
             'visanet_transaction_type': transaction_type,
@@ -64,7 +66,6 @@ class AcquirerVisaNet(models.Model):
             'visanet_partner_address2': visanet_partner_address2,
             'visanet_signed_field_names': ','.join(signed_field_names),
             'visanet_unsigned_field_names': unsigned_field_names,
-            'visanet_return': '%s' % urllib.parse.urljoin(base_url, VisaNetController._return_url),
             'visanet_signature': base64.b64encode(hmac.new(key, message, digestmod=hashlib.sha256).digest()),
         })
         return visanet_tx_values
@@ -83,15 +84,14 @@ class TxVisaNet(models.Model):
     def _visanet_form_get_tx_from_data(self, data):
         """ Given a data dict coming from visanet, verify it and find the related
         transaction record. """
-        complete_reference = data.get('req_reference_number')
-        if not complete_reference:
-            error_msg = _('VisaNet: received data with missing reference (%s)') % (complete_reference)
+        reference = data.get('req_reference_number')
+        if not reference:
+            error_msg = _('VisaNet: received data with missing reference (%s)') % (reference)
             _logger.info(error_msg)
             raise ValidationError(error_msg)
 
-        reference_parts = complete_reference.split('|')
-        reference = reference_parts[0]
         tx = self.search([('reference', '=', reference)])
+        _logger.info(tx)
 
         if version_info[0] == 11:
             if tx.sale_order_id:
