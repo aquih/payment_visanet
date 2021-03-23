@@ -14,6 +14,8 @@
         'views/payment_visanet_templates.xml',
         'data/payment_acquirer_data.xml',
     ],
+    'images': ['static/description/icon.png'],
     'installable': True,
     'post_init_hook': 'create_missing_journal_for_acquirers',
+    'uninstall_hook': 'uninstall_hook',
 }

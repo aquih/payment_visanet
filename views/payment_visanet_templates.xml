@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+        
+        <template id="assets_frontend" inherit_id="web.assets_frontend">
+            <xpath expr="script[last()]" position="after">
+                <script type="text/javascript" src="/payment_visanet/static/src/js/payment_form.js"></script>
+            </xpath>
+        </template>
+        
+        <template id="payment_tokens_list" inherit_id="payment.payment_tokens_list">
+            <xpath expr='//input[@name="callback_method"]' position='after'>
+                <input type="hidden" t-if="len([x for x in acquirers if x.provider == 'visanet']) > 0" name="recaptcha_v3_site_key" t-att-value="[x for x in acquirers if x.provider == 'visanet'][0].visanet_recaptcha_v3_site_key"/>
+            </xpath>
+        </template>
 
         <template id="visanet_form">
             <div>

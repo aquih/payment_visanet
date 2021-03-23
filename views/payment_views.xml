@@ -9,9 +9,10 @@
             <field name="arch" type="xml">
                 <xpath expr='//group[@name="acquirer"]' position='inside'>
                     <group attrs="{'invisible': [('provider', '!=', 'visanet')]}">
+                        <field name="visanet_profile_id"/>
                         <field name="visanet_access_key"/>
                         <field name="visanet_secret_key"/>
-                        <field name="visanet_profile_id"/>
+                        <field name="visanet_recaptcha_v3_site_key"/>
                     </group>
                 </xpath>
             </field>
