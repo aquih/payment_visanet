@@ -25,7 +25,7 @@ class AcquirerVisaNet(models.Model):
     visanet_access_key = fields.Char('Access Key', required_if_provider='visanet', groups='base.group_user')
     visanet_secret_key = fields.Char('Secret Key', required_if_provider='visanet', groups='base.group_user')
     visanet_profile_id = fields.Char('Profile ID', required_if_provider='visanet', groups='base.group_user')
-    visanet_recaptcha_v3_site_key = fields.Char('Clave de Sitio de reCAPTCHA V3', required_if_provider='visanet', groups='base.group_user')
+    visanet_recaptcha_v3_site_key = fields.Char('Clave de Sitio de reCAPTCHA V3', required_if_provider='visanet')
 
     def visanet_form_generate_values(self, values):
         reference = values['reference']
