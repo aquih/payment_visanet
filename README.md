@@ -1,5 +1,7 @@
 # payment_visanet
 
+Funciona con versión 12.0, 13.0 y 14.0 de Odoo
+
 Es necesario activar lo siguiente:
 https://ebc2test.cybersource.com/ebc2/app/PaymentConfiguration/SecureAcceptanceSettings
 * CVN en los tipos de tarjetas en Payment Settings
