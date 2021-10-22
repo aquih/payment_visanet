@@ -21,7 +21,7 @@ signed_field_names = ['access_key', 'profile_id', 'transaction_uuid', 'signed_fi
 class AcquirerVisaNet(models.Model):
     _inherit = 'payment.acquirer'
 
-    provider = fields.Selection(selection_add=[('visanet', 'VisaNet')])
+    provider = fields.Selection(selection_add=[('visanet', 'VisaNet')], ondelete={'visanet': 'set default'})
     visanet_access_key = fields.Char('Access Key', required_if_provider='visanet', groups='base.group_user')
     visanet_secret_key = fields.Char('Secret Key', required_if_provider='visanet', groups='base.group_user')
     visanet_profile_id = fields.Char('Profile ID', required_if_provider='visanet', groups='base.group_user')
