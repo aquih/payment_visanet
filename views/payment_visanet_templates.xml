@@ -2,21 +2,8 @@
 <odoo>
     <data>
         
-        <template id="assets_frontend" inherit_id="web.assets_frontend">
-            <xpath expr="script[last()]" position="after">
-                <script type="text/javascript" src="/payment_visanet/static/src/js/payment_form.js"></script>
-            </xpath>
-        </template>
-        
-        <template id="payment_tokens_list" inherit_id="payment.payment_tokens_list">
-            <xpath expr='//input[@name="callback_method"]' position='after'>
-                <input type="hidden" t-if="len([x for x in acquirers if x.provider == 'visanet']) > 0" name="recaptcha_v3_site_key" t-att-value="[x for x in acquirers if x.provider == 'visanet'][0].visanet_recaptcha_v3_site_key"/>
-            </xpath>
-        </template>
-
-        <template id="visanet_form">
-            <div>
-                <input type="hidden" name="data_set" t-att-data-action-url="tx_url" data-remove-me=""/>
+        <template id="redirect_form">
+            <form t-att-action="api_url" method="post">
                 <input type="hidden" name="access_key" t-att-value="visanet_access_key" />
                 <input type="hidden" name="profile_id" t-att-value="visanet_profile_id"/>
                 <input type="hidden" name="amount" t-att-value="visanet_amount"/>
@@ -31,17 +18,17 @@
                 <input type="hidden" name="signature" t-att-value="visanet_signature"/>
                 
                 <input type="hidden" name="unsigned_field_names" t-att-value="visanet_unsigned_field_names"/>
-                <input type="hidden" name="bill_to_forename" t-att-value="partner_first_name"/>
-                <input type="hidden" name="bill_to_surname" t-att-value="partner_last_name"/>
-                <input type="hidden" name="bill_to_email" t-att-value="partner_email"/>
+                <input type="hidden" name="bill_to_forename" t-att-value="visanet_partner_forename"/>
+                <input type="hidden" name="bill_to_surname" t-att-value="visanet_partner_surname"/>
+                <input type="hidden" name="bill_to_email" t-att-value="visanet_partner_email"/>
                 <input type="hidden" name="bill_to_address_line1" t-att-value="visanet_partner_address1"/>
                 <input type="hidden" name="bill_to_address_line2" t-att-value="visanet_partner_address2"/>
-                <input type="hidden" name="bill_to_address_postal_code" t-att-value="partner_zip"/>
-                <input type="hidden" name="bill_to_address_city" t-att-value="partner_city"/>
-                <input type="hidden" name="bill_to_address_state" t-att-value="partner_state.code"/>
-                <input type="hidden" name="bill_to_address_country" t-att-value="partner_country.code"/>
+                <input type="hidden" name="bill_to_address_postal_code" t-att-value="visanet_partner_postal_code"/>
+                <input type="hidden" name="bill_to_address_city" t-att-value="visanet_partner_city"/>
+                <input type="hidden" name="bill_to_address_state" t-att-value="visanet_partner_state"/>
+                <input type="hidden" name="bill_to_address_country" t-att-value="visanet_partner_country"/>
                 <input type="hidden" name="bill_to_phone" t-att-value="partner_phone.zfill(6) if partner_phone else ''"/>
-            </div>
+            </form>
         </template>
 
     </data>

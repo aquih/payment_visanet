@@ -24,7 +24,6 @@ class VisaNetController(http.Controller):
         
         headers = {
             'Location': response_return_url,
-            #'X-Openerp-Session-Id': 'eb89202cb7b73e3653cc3952ea54336a993422d6',
         }
                 
         response = Response(response_return_url, status=302, headers=headers)

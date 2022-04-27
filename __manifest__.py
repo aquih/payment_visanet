@@ -2,9 +2,9 @@
 
 {
     'name': 'VisaNet Payment Acquirer',
-    'category': 'Accounting/Payment',
+    'category': 'Accounting/Payment Acquirers',
     'summary': 'Payment Acquirer: VisaNet Implementation',
-    'version': '1.0',
+    'version': '2.0',
     'description': """VisaNet Payment Acquirer""",
     'author': 'aquíH',
     'website': 'http://aquih.com/',
@@ -16,6 +16,6 @@
     ],
     'images': ['static/description/icon.png'],
     'installable': True,
-#    'post_init_hook': 'create_missing_journal_for_acquirers',
-#    'uninstall_hook': 'uninstall_hook',
+    'uninstall_hook': 'uninstall_hook',
+    'license': 'Other OSI approved licence',
 }
