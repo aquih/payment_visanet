@@ -21,21 +21,21 @@ class VisaNetController(http.Controller):
         """
         _logger.info('VisaNet: entering _handle_feedback_data with post data %s', pprint.pformat(data))  # debug
         request.env['payment.transaction'].sudo()._handle_feedback_data('visanet', data)
-        return request.redirect('/payment/status')
+        #  request.redirect('/payment/status')
 
-        # response_return_url = data.pop('return_url', '/payment/process')
+        response_return_url = data.pop('return_url', '/payment/status')
         
-        # headers = {
-        #     'Location': response_return_url,
-        # }
+        headers = {
+            'Location': response_return_url,
+        }
                 
-        # response = Response(response_return_url, status=302, headers=headers)
-        # if data.get('req_ship_to_address_city'):
-        #     session_id = data.get('req_ship_to_address_city')
-        #     _logger.warn('req session_id: {}'.format(session_id))
-        #     _logger.warn('current session_id: {}'.format(request.session.sid))
-        #     if session_id != request.session.sid:
-        #         _logger.warn('setting session_id: {}'.format(session_id))
-        #         response.set_cookie('session_id', session_id, max_age=90 * 24 * 60 * 60, httponly=True)
+        response = Response(response_return_url, status=302, headers=headers)
+        if data.get('req_ship_to_address_city'):
+            session_id = data.get('req_ship_to_address_city')
+            # _logger.warn('req session_id: {}'.format(session_id))
+            # _logger.warn('current session_id: {}'.format(request.session.sid))
+            if session_id != request.session.sid:
+                # _logger.warn('setting session_id: {}'.format(session_id))
+                response.set_cookie('session_id', session_id, max_age=90 * 24 * 60 * 60, httponly=True)
 
-        # return response
+        return response
