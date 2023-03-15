@@ -26,8 +26,8 @@ class PaymentTransaction(models.Model):
             return res
         
         return_url = urls.url_join(self.acquirer_id.get_base_url(), VisaNetController._return_url),
-        reference = self.reference
         session_id = request.session.sid
+        reference = self.reference
         transaction_date = fields.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         transaction_uuid = uuid.uuid4().hex
         unsigned_field_names = 'bill_to_forename,bill_to_surname,bill_to_email,bill_to_address_line1,bill_to_address_line2,bill_to_address_postal_code,bill_to_address_city,bill_to_address_state,bill_to_address_country,bill_to_phone'
@@ -95,7 +95,7 @@ class PaymentTransaction(models.Model):
             if not tx:
                 error_msg += _('; no order found')
             else:
-                error_msg += _('; multiple order found')
+                error_msg += _('; multiple orders found')
             _logger.info(error_msg)
             raise ValidationError(error_msg)
 
@@ -106,7 +106,7 @@ class PaymentTransaction(models.Model):
         if self.provider != 'visanet':
             return
         
-        self.acquirer_reference =  data.get('req_reference_number'),
+        self.acquirer_reference = data.get('req_reference_number')
         status_code = data.get('decision', 'ERROR')
         if status_code == 'ACCEPT':
             self._set_done()
