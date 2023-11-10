@@ -11,11 +11,13 @@ odoo.define('payment_visanet.payment_form', function (require) {
 
         willStart: function () {
             var recaptcha_v3_site_key = $('[name="recaptcha_v3_site_key"]').val();
-            if (recaptcha_v3_site_key) {
-                return this._super.apply(this, arguments).then(function () {
+            return this._super.apply(this, arguments).then(function () {
+                if (recaptcha_v3_site_key) {
                     return ajax.loadJS("https://www.google.com/recaptcha/api.js?render="+recaptcha_v3_site_key);
-                })
-            }
+                } else {
+                    return true;
+                }
+            })
         },
 
         //--------------------------------------------------------------------------
