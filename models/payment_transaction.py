@@ -25,7 +25,7 @@ class PaymentTransaction(models.Model):
         if self.provider != 'visanet':
             return res
         
-        return_url = urls.url_join(self.acquirer_id.get_base_url(), VisaNetController._return_url),
+        return_url = urls.url_join(self.acquirer_id.get_base_url(), VisaNetController._return_url)
         session_id = request.session.sid
         reference = self.reference
         transaction_date = fields.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
