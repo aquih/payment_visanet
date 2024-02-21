@@ -15,7 +15,7 @@ from odoo.http import request
 
 _logger = logging.getLogger(__name__)
 
-signed_field_names = ['access_key', 'profile_id', 'transaction_uuid', 'signed_field_names', 'unsigned_field_names', 'signed_date_time', 'locale', 'transaction_type', 'reference_number', 'amount', 'currency', 'ship_to_address_city']
+signed_field_names = ['access_key', 'profile_id', 'transaction_uuid', 'signed_field_names', 'unsigned_field_names', 'signed_date_time', 'locale', 'transaction_type', 'reference_number', 'amount', 'currency']
 
 class PaymentTransaction(models.Model):
     _inherit = 'payment.transaction'
@@ -26,7 +26,6 @@ class PaymentTransaction(models.Model):
             return res
         
         return_url = urls.url_join(self.acquirer_id.get_base_url(), VisaNetController._return_url)
-        session_id = request.session.sid
         reference = self.reference
         transaction_date = fields.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         transaction_uuid = uuid.uuid4().hex
@@ -37,7 +36,7 @@ class PaymentTransaction(models.Model):
         visanet_partner_address1 = self.partner_id.street[0:35] if self.partner_id.street else ''
         visanet_partner_address2 = self.partner_id.street2[0:35] if self.partner_id.street2 else ''
 
-        signed_field_values = [self.acquirer_id.visanet_access_key, self.acquirer_id.visanet_profile_id, transaction_uuid, ','.join(signed_field_names), unsigned_field_names, transaction_date, language, transaction_type, reference, self.amount, currency, session_id]
+        signed_field_values = [self.acquirer_id.visanet_access_key, self.acquirer_id.visanet_profile_id, transaction_uuid, ','.join(signed_field_names), unsigned_field_names, transaction_date, language, transaction_type, reference, self.amount, currency]
 
         signed_string = []
         for i in range(len(signed_field_names)):
@@ -54,7 +53,6 @@ class PaymentTransaction(models.Model):
             'visanet_amount': self.amount,
             'visanet_reference': reference,
             'visanet_uuid': transaction_uuid,
-            'visanet_session_id': session_id,
             'visanet_date': transaction_date,
             'visanet_language': language,
             'visanet_transaction_type': transaction_type,
