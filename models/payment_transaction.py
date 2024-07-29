@@ -8,10 +8,9 @@ import uuid
 from werkzeug import urls
 
 from odoo import api, fields, models, _
-from odoo.addons.payment.models.payment_acquirer import ValidationError
+from odoo.exceptions import ValidationError
+
 from odoo.addons.payment_visanet.controllers.payment import VisaNetController
-from odoo.tools.float_utils import float_compare
-from odoo.http import request
 
 _logger = logging.getLogger(__name__)
 
@@ -74,18 +73,18 @@ class PaymentTransaction(models.Model):
         return rendering_values
 
     @api.model
-    def _get_tx_from_feedback_data(self, provider, data):
-        tx = super()._get_tx_from_feedback_data(provider, data)
-        if provider != 'visanet':
+    def _get_tx_from_notification_data(self, provider_code, notification_data):
+        tx = super()._get_tx_from_notification_data(provider_code, notification_data)
+        if provider_code != 'visanet':
             return tx
         
-        reference = data.get('req_reference_number')
+        reference = notification_data.get('req_reference_number')
         if not reference:
             error_msg = _('VisaNet: received data with missing reference (%s)') % (reference)
             _logger.info(error_msg)
             raise ValidationError(error_msg)
 
-        tx = self.search([('reference', '=', reference), ('provider', '=', 'visanet')])
+        tx = self.search([('reference', '=', reference), ('provider_code', '=', 'visanet')])
         _logger.info(tx)
 
         if not tx or len(tx) > 1:
@@ -99,16 +98,16 @@ class PaymentTransaction(models.Model):
 
         return tx
 
-    def _process_feedback_data(self, data):
-        super()._process_feedback_data(data)
+    def _process_notification_data(self, notification_data):
+        super()._process_notification_data(notification_data)
         if self.provider != 'visanet':
             return
         
-        self.acquirer_reference = data.get('req_reference_number')
-        status_code = data.get('decision', 'ERROR')
+        self.acquirer_reference = notification_data.get('req_reference_number')
+        status_code = notification_data.get('decision', 'ERROR')
         if status_code == 'ACCEPT':
             self._set_done()
         else:
-            error = 'VisaNet: error '+data.get('message')
+            error = 'VisaNet: error '+notification_data.get('message')
             _logger.info(error)
             self._set_error(_("Your payment was refused (code %s). Please try again.", status_code))

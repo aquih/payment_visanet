@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="provider_form_visanet" model="ir.ui.view">
+        <field name="name">provider.form.visanet</field>
+        <field name="model">payment.provider</field>
+        <field name="inherit_id" ref="payment.payment_provider_form"/>
+        <field name="arch" type="xml">
+            <group name="provider_credentials" position='inside'>
+                <group invisible="code != 'visanet'">
+                    <field name="visanet_profile_id"/>
+                    <field name="visanet_access_key"/>
+                    <field name="visanet_secret_key"/>
+                </group>
+            </group>
+        </field>
+    </record>
+
+</odoo>

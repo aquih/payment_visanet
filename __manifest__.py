@@ -10,7 +10,7 @@
     'website': 'http://aquih.com/',
     'depends': ['payment'],
     'data': [
-        'views/payment_views.xml',
+        'views/payment_provider_views.xml',
         'views/payment_visanet_templates.xml',
         'data/payment_acquirer_data.xml',
     ],
