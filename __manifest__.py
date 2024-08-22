@@ -4,7 +4,7 @@
     'name': 'VisaNet Payment Acquirer',
     'category': 'Accounting/Payment Acquirers',
     'summary': 'Payment Acquirer: VisaNet Implementation',
-    'version': '2.0',
+    'version': '2.1',
     'description': """VisaNet Payment Acquirer""",
     'author': 'aquíH',
     'website': 'http://aquih.com/',

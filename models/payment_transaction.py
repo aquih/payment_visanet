@@ -100,10 +100,11 @@ class PaymentTransaction(models.Model):
 
     def _process_notification_data(self, notification_data):
         super()._process_notification_data(notification_data)
-        if self.provider != 'visanet':
+        if self.provider_code != 'visanet':
             return
         
-        self.acquirer_reference = notification_data.get('req_reference_number')
+        self.provider_reference = notification_data.get('req_reference_number')
+
         status_code = notification_data.get('decision', 'ERROR')
         if status_code == 'ACCEPT':
             self._set_done()

@@ -3,6 +3,8 @@ import logging
 
 from odoo import api, fields, models, _
 
+from odoo.addons.payment_visanet import const
+
 _logger = logging.getLogger(__name__)
 
 
@@ -20,3 +22,10 @@ class PaymentProvider(models.Model):
             return "https://secureacceptance.cybersource.com/pay"
         else:
             return "https://testsecureacceptance.cybersource.com/pay"
+
+    def _get_default_payment_method_codes(self):
+        """ Override of `payment` to return the default payment method codes. """
+        default_codes = super()._get_default_payment_method_codes()
+        if self.code != 'migo':
+            return default_codes
+        return const.DEFAULT_PAYMENT_METHODS_CODES
