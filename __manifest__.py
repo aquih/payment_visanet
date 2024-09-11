@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name': 'VisaNet Payment Acquirer',
-    'category': 'Accounting/Payment Acquirers',
-    'summary': 'Payment Acquirer: VisaNet Implementation',
+    'name': 'VisaNet Payment Provider',
+    'category': 'Accounting/Payment Providers',
+    'summary': 'Payment Provider: VisaNet Implementation',
     'version': '2.1',
-    'description': """VisaNet Payment Acquirer""",
+    'description': """VisaNet Payment Provider""",
     'author': 'aquíH',
     'website': 'http://aquih.com/',
     'depends': ['payment'],
