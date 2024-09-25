@@ -6,6 +6,6 @@ _logger = logging.getLogger(__name__)
 
 def migrate(cr, version):
     env = util.env(cr)
-    if not env.ref('payment_visanet.payment_provider_visanet'):
+    if not env.ref('payment_visanet.payment_provider_visanet', raise_if_not_found=False):
         util.records.rename_xmlid(cr, 'payment_visanet.payment_acquirer_visanet', 'payment_visanet.payment_provider_visanet')
         _logger.info("xmlid renombrado")
