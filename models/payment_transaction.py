@@ -21,7 +21,7 @@ class PaymentTransaction(models.Model):
     
     def _get_specific_rendering_values(self, processing_values):
         res = super()._get_specific_rendering_values(processing_values)
-        if self.provider != 'visanet':
+        if processing_values['provider_code'] != 'visanet':
             return res
         
         return_url = urls.url_join(self.provider_id.get_base_url(), VisaNetController._return_url)
