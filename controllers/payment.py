@@ -21,8 +21,7 @@ class VisaNetController(http.Controller):
         """
         if data:
             _logger.info('VisaNet: entering _handle_feedback_data with post data %s', pprint.pformat(data))  # debug
-            request.env['payment.transaction'].sudo()._handle_feedback_data('visanet', data)
             tx_sudo = request.env['payment.transaction'].sudo()._get_tx_from_notification_data('visanet', data)
-            tx_sudo._handle_notification_data('visanet', data)
+            tx_sudo._process_notification_data('visanet', data)
 
         return request.redirect('/payment/status')
