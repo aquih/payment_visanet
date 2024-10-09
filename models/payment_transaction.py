@@ -87,6 +87,11 @@ class PaymentTransaction(models.Model):
         tx = self.search([('reference', '=', reference), ('provider_code', '=', 'visanet')])
         _logger.info(tx)
 
+        payment_method = self.env['payment.method']._get_from_code(
+            'visanet'
+        )
+        self.payment_method_id = payment_method or self.payment_method_id
+
         if not tx or len(tx) > 1:
             error_msg = _('VisaNet: received data for reference %s') % (reference)
             if not tx:

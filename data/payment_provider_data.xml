@@ -9,7 +9,7 @@
         <field name="module_id" ref="base.module_payment_visanet"/>
         <field name="payment_method_ids"
                eval="[(6, 0, [
-                   ref('payment.payment_method_card'),
+                   ref('payment_visanet.payment_method_visanet'),
                ])]"/>
         <field name="code">visanet</field>
         <field name="redirect_form_view_id" ref="redirect_form"/>

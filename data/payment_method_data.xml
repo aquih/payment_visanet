@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="payment_method_visanet" model="payment.method">
+        <field name="name">VisaNet</field>
+        <field name="code">visanet</field>
+        <field name="sequence">1</field>
+        <field name="image" type="base64" file="payment_visanet/static/description/icon.png"/>
+        <field name="active">True</field>
+        <field name="brand_ids"
+               eval="[Command.set([
+                         ref('payment.payment_method_visa'),
+                         ref('payment.payment_method_mastercard'),
+                     ])]"
+        />
+    </record>
+
+</odoo>
